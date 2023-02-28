@@ -55,5 +55,6 @@ func main() {
 	if _, err := strconv.Atoi(port); err != nil {
 		log.Fatalf("invalid port: %s", port)
 	}
+	fmt.Println("Listening on port", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 }
