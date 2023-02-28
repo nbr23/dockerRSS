@@ -30,7 +30,13 @@ type dockerhubImage struct {
 }
 
 func parseDockerImage(imageName string) dockerImageName {
-	var org, image string
+	var org, image, tag string
+
+	if strings.Contains(imageName, ":") {
+		split := strings.Split(imageName, ":")
+		imageName = split[0]
+		tag = split[1]
+	}
 
 	// default org is "library"
 	if strings.Contains(imageName, "/") {
@@ -45,7 +51,24 @@ func parseDockerImage(imageName string) dockerImageName {
 	return dockerImageName{
 		Org:   org,
 		Image: image,
+		Tag:   tag,
 	}
+}
+
+func getDockerImageTagDetails(image dockerImageName) (dockerhubTag, error) {
+	res, err := http.Get(fmt.Sprintf("https://hub.docker.com/v2/repositories/%s/tags/%s", image, image.Tag))
+	if err != nil {
+		return dockerhubTag{}, err
+	}
+	defer res.Body.Close()
+
+	var dResponse dockerhubTag
+	err = json.NewDecoder(res.Body).Decode(&dResponse)
+	if err != nil {
+		return dockerhubTag{}, err
+	}
+
+	return dResponse, nil
 }
 
 func getDockerImageTags(image dockerImageName) ([]dockerhubTag, error) {

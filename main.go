@@ -12,6 +12,7 @@ import (
 type dockerImageName struct {
 	Org   string
 	Image string
+	Tag   string
 }
 
 func (d dockerImageName) String() string {
@@ -33,10 +34,22 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 	imageName := strings.TrimPrefix(r.URL.Path, "/tags/")
 	image := parseDockerImage(imageName)
 
-	tags, err := getDockerImageTags(image)
-	if err != nil {
-		http.Error(w, "no tags found", http.StatusNotFound)
-		return
+	var tags []dockerhubTag
+	var err error
+
+	if image.Tag != "" {
+		t, err := getDockerImageTagDetails(image)
+		if err != nil {
+			http.Error(w, "tag not found", http.StatusNotFound)
+			return
+		}
+		tags = append(tags, t)
+	} else {
+		tags, err = getDockerImageTags(image)
+		if err != nil {
+			http.Error(w, "no tags found", http.StatusNotFound)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/atom+xml")
