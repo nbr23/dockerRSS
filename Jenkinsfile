@@ -28,7 +28,7 @@ pipeline {
         stage('Build DockerRSS Image') {
             steps {
                 sh """
-                    docker buildx build --pull --builder \$BUILDX_BUILDER  --platform linux/amd64,linux/arm64 -t nbr23/dockerrss:latest --push .
+                    docker buildx build --pull --builder \$BUILDX_BUILDER  --platform linux/amd64,linux/arm64 -t nbr23/dockerrss:latest -f docker/Dockerfile --push .
                     """
             }
         }
