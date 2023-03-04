@@ -3,12 +3,21 @@ pipeline {
 
     options {
         disableConcurrentBuilds()
+        ansiColor('xterm')
     }
 
     stages {
         stage('Checkout'){
             steps {
                 checkout scm
+            }
+        }
+        stage('Tests'){
+            steps {
+                script {
+                    env.REAL_PWD = getDockerPWD();
+                    sh 'docker run -t -w /app -v $REAL_PWD:/app --rm golang:alpine go test ./dockerhub'
+                }
             }
         }
         stage('Prep buildx') {
@@ -49,7 +58,7 @@ pipeline {
     post {
         always {
             sh 'docker buildx stop $BUILDX_BUILDER || true'
-            sh 'docker buildx rm $BUILDX_BUILDER'
+            sh 'docker buildx rm $BUILDX_BUILDER || true'
         }
     }
 }
