@@ -1,13 +1,15 @@
-package main
+package atom
 
 import (
 	"crypto/sha256"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/nbr23/dockerRSS/dockerhub"
 )
 
-func dockerhubTagToAtomEntry(image dockerImageName, tag dockerhubTag) string {
+func dockerhubTagToAtomEntry(image dockerhub.DockerImageName, tag dockerhub.DockerhubTag) string {
 	// We just use the first image in the manifest list, shouldn't matter much
 	if len(tag.Digest) == 0 {
 		tag.Digest = tag.Images[0].Digest
@@ -25,7 +27,7 @@ func dockerhubTagToAtomEntry(image dockerImageName, tag dockerhubTag) string {
 	`, image.Pretty(), tag.Name, guid, tag.LastUpdated, image, tag.Name, digest)
 }
 
-func generateAtomFeed(image dockerImageName, tags []dockerhubTag) string {
+func GenerateAtomFeed(image dockerhub.DockerImageName, tags []dockerhub.DockerhubTag) string {
 	var entries []string
 	var lastPushed time.Time
 	for _, tag := range tags {

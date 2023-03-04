@@ -7,24 +7,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/nbr23/dockerRSS/atom"
+	"github.com/nbr23/dockerRSS/dockerhub"
 )
-
-type dockerImageName struct {
-	Org   string
-	Image string
-	Tag   string
-}
-
-func (d dockerImageName) String() string {
-	return fmt.Sprintf("%s/%s", d.Org, d.Image)
-}
-
-func (d dockerImageName) Pretty() string {
-	if d.Org == "library" {
-		return d.Image
-	}
-	return fmt.Sprintf("%s/%s", d.Org, d.Image)
-}
 
 type MyEvent struct {
 	Name string `json:"name"`
@@ -32,13 +18,13 @@ type MyEvent struct {
 
 func tagsHandler(w http.ResponseWriter, r *http.Request) {
 	imageName := strings.TrimPrefix(r.URL.Path, "/tags/")
-	image := parseDockerImage(imageName)
+	image := dockerhub.ParseDockerImage(imageName)
 
-	var tags []dockerhubTag
+	var tags []dockerhub.DockerhubTag
 	var err error
 
 	if image.Tag != "" {
-		t, err := getDockerImageTagDetails(image)
+		t, err := dockerhub.GetDockerImageTagDetails(image)
 		if err != nil {
 			http.Error(w, "tag not found", http.StatusNotFound)
 			log.Printf("%s 404 tag not found: %s", r.URL.Path, err)
@@ -46,7 +32,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		tags = append(tags, t)
 	} else {
-		tags, err = getDockerImageTags(image)
+		tags, err = dockerhub.GetDockerImageTags(image)
 		if err != nil {
 			http.Error(w, "no tags found", http.StatusNotFound)
 			log.Printf("%s 404 tag not found: %s", r.URL.Path, err)
@@ -56,7 +42,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/atom+xml")
 
-	atomFeed := generateAtomFeed(image, tags)
+	atomFeed := atom.GenerateAtomFeed(image, tags)
 	log.Printf("%s 200", r.URL.Path)
 	fmt.Fprint(w, atomFeed)
 }
