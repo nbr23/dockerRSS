@@ -31,9 +31,9 @@ func TestDockerImageString(t *testing.T) {
 		fullName string
 	}{
 		{"alpine", "library/alpine"},
-		{"alpine:latest", "library/alpine:latest"},
+		{"alpine:latest", "library/alpine"},
 		{"nbr23/dockerrss", "nbr23/dockerrss"},
-		{"nbr23/dockerrss:latest", "nbr23/dockerrss:latest"},
+		{"nbr23/dockerrss:latest", "nbr23/dockerrss"},
 	}
 
 	for _, tc := range testCases {
