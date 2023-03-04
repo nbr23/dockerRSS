@@ -59,6 +59,9 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	http.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "ok")
+	})
 	http.HandleFunc("/tags/", tagsHandler)
 
 	port := os.Getenv("PORT")
