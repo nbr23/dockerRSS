@@ -14,7 +14,10 @@ type DockerImageName struct {
 }
 
 func (d DockerImageName) String() string {
-	return fmt.Sprintf("%s/%s", d.Org, d.Image)
+	if d.Tag == "" {
+		return fmt.Sprintf("%s/%s", d.Org, d.Image)
+	}
+	return fmt.Sprintf("%s/%s:%s", d.Org, d.Image, d.Tag)
 }
 
 func (d DockerImageName) Pretty() string {
