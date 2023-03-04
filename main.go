@@ -41,6 +41,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 		t, err := getDockerImageTagDetails(image)
 		if err != nil {
 			http.Error(w, "tag not found", http.StatusNotFound)
+			log.Printf("%s 404 tag not found: %s", r.URL.Path, err)
 			return
 		}
 		tags = append(tags, t)
@@ -48,6 +49,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 		tags, err = getDockerImageTags(image)
 		if err != nil {
 			http.Error(w, "no tags found", http.StatusNotFound)
+			log.Printf("%s 404 tag not found: %s", r.URL.Path, err)
 			return
 		}
 	}
@@ -55,6 +57,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/atom+xml")
 
 	atomFeed := generateAtomFeed(image, tags)
+	log.Printf("%s 200", r.URL.Path)
 	fmt.Fprint(w, atomFeed)
 }
 
