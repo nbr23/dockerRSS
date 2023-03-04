@@ -1,4 +1,4 @@
-FROM golang:alpine as builder
+FROM golang:1.19-alpine as builder
 ENV PORT=8080
 
 WORKDIR /app
