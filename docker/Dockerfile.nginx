@@ -1,0 +1,21 @@
+FROM golang:1.19-alpine as builder
+
+WORKDIR /app
+
+COPY *.go go.* /app
+
+RUN go build
+
+FROM alpine
+
+RUN apk update && apk add nginx && rm -rf /var/cache/apk/*
+
+COPY --from=builder /app/dockerRSS /usr/local/bin/dockerRSS
+
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+
+EXPOSE 8080
+
+ENV PORT=8081
+
+CMD ["sh", "-c", "nginx && dockerRSS"]

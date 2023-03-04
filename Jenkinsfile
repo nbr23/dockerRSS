@@ -32,6 +32,13 @@ pipeline {
                     """
             }
         }
+        stage('Build DockerRSS-nginx Image') {
+            steps {
+                sh """
+                    docker buildx build --pull --builder \$BUILDX_BUILDER  --platform linux/amd64,linux/arm64 -t nbr23/dockerrss:nginx-latest -f docker/Dockerfile.nginx --push .
+                    """
+            }
+        }
         stage('Sync github repo') {
             when { branch 'master' }
             steps {
