@@ -23,7 +23,7 @@ export default {
 
 <template>
   <div class="bg-blue-100 flex h-screen w-full items-center justify-center ">
-    <div class="px-16 py-10 max-sm:px-8">
+    <div class="">
       <Header></Header>
       <div class="container mx-auto justify-center flex px-5 py-1 md:flex-row mx-auto w-screen items-center">
         <main>
