@@ -53,6 +53,13 @@ func main() {
 	})
 	http.HandleFunc("/tags/", tagsHandler)
 
+	static_dir := os.Getenv("HTTP_STATIC_DIR")
+	if static_dir == "" {
+		static_dir = "static"
+	}
+	fs := http.FileServer(http.Dir(static_dir))
+	http.Handle("/", fs)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
