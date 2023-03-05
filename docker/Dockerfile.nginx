@@ -1,3 +1,10 @@
+FROM node as nodebuilder
+USER node
+
+COPY --chown=node ./front /app
+WORKDIR /app/front
+RUN npm i && npm run build
+
 FROM golang:1.19-alpine as builder
 
 WORKDIR /app
@@ -13,11 +20,14 @@ FROM alpine
 RUN apk update && apk add nginx && rm -rf /var/cache/apk/*
 
 COPY --from=builder /app/dockerRSS /usr/local/bin/dockerRSS
+COPY --from=nodebuilder /app/dist /usr/local/bin/dist
 
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 
 EXPOSE 8080
 
 ENV PORT=8081
+
+ENV HTTP_STATIC_DIR=/usr/local/bin/dist
 
 CMD ["sh", "-c", "nginx && dockerRSS"]
