@@ -38,11 +38,11 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	arch := r.URL.Query().Get("arch")
-	if arch != "" {
+	platformStr := r.URL.Query().Get("platform")
+	if platformStr != "" {
 		var filteredImages []dockerhub.DockerhubImage
 		for _, i := range images {
-			if i.Architecture == arch {
+			if i.IsPlatform(dockerhub.ParsePlatform(platformStr)) {
 				filteredImages = append(filteredImages, i)
 			}
 		}

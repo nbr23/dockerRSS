@@ -13,6 +13,12 @@ type DockerImageName struct {
 	Tag   string
 }
 
+type DockerImagePlatform struct {
+	Os           string
+	Architecture string
+	Variant      string
+}
+
 func (d DockerImageName) GetImageURL(digest string) string {
 	return fmt.Sprintf("https://hub.docker.com/v2/layers/%s/%s/images/%s", d.Org, d.Image, digest)
 }
@@ -59,8 +65,46 @@ type DockerhubImage struct {
 	Digest       string `json:"digest"`
 	Architecture string `json:"architecture"`
 	Os           string `json:"os"`
+	Variant      string `json:"variant"`
 	LastPushed   string `json:"last_pushed"`
 	FullName     DockerImageName
+}
+
+func (p DockerhubImage) Platform() string {
+	if p.Variant != "" {
+		return fmt.Sprintf("%s/%s/%s", p.Os, p.Architecture, p.Variant)
+	}
+	return fmt.Sprintf("%s/%s", p.Os, p.Architecture)
+}
+
+func ParsePlatform(platform string) DockerImagePlatform {
+	var p DockerImagePlatform
+	split := strings.Split(platform, "/")
+	if len(split) == 1 {
+		p.Os = platform
+		return p
+	}
+	p.Os = split[0]
+	if len(split) >= 1 {
+		p.Architecture = split[1]
+		if len(split) == 3 {
+			p.Variant = split[2]
+		}
+	}
+	return p
+}
+
+func (i DockerhubImage) IsPlatform(p DockerImagePlatform) bool {
+	if i.Os != p.Os {
+		return false
+	}
+	if p.Architecture != "" && i.Architecture != p.Architecture {
+		return false
+	}
+	if p.Variant != "" && i.Variant != p.Variant {
+		return false
+	}
+	return true
 }
 
 func ParseDockerImage(imageName string) DockerImageName {

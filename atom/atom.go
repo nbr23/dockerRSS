@@ -15,12 +15,12 @@ func dockerhubTagToAtomEntry(image dockerhub.DockerhubImage) string {
 	guid := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprint(image.FullName.Pretty(), image.FullName, image.Os, image.Architecture, image.LastPushed))))
 	return fmt.Sprintf(`
 	<entry>
-		<title>%s - %s/%s</title>
+		<title>%s - %s</title>
 		<guid>%s</guid>
 		<updated>%s</updated>
 		<link href="%s" />
 	</entry>
-	`, image.FullName.Pretty(), image.Os, image.Architecture, guid, image.LastPushed, image.FullName.GetImageURL(digest))
+	`, image.FullName.Pretty(), image.Platform(), guid, image.LastPushed, image.FullName.GetImageURL(digest))
 
 }
 

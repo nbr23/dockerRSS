@@ -14,7 +14,7 @@ export default {
   },
   methods: {
     getRssFeedURL: function () {
-      return this.currentUrl + "tags/" + this.imageName + (this.imageTag == '' ? '' : ':' + this.imageTag) + (this.imagePlatform == 'Any' || this.imagePlatform == '' ? '' : '?arch=' + this.imagePlatform);
+      return this.currentUrl + "tags/" + this.imageName + (this.imageTag == '' ? '' : ':' + this.imageTag) + (this.imagePlatform == 'Any' || this.imagePlatform == '' ? '' : '?platform=' + this.imagePlatform);
     },
     copyUrlToClipboard: function (str) {
       navigator.clipboard.writeText(str);
