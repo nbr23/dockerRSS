@@ -24,8 +24,9 @@ export default {
 </script>
 
 <template>
-  <a href="https://github.com/nbr23/dockerRSS"><img width="149" height="149" src="/forkme_right_darkblue_121621.svg"
-      class="attachment-full size-full absolute top-0 right-0" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+  <a href="https://github.com/nbr23/dockerRSS"><img width="149" height="149"
+      src="/static/forkme_right_darkblue_121621.svg" class="attachment-full size-full absolute top-0 right-0"
+      alt="Fork me on GitHub" data-recalc-dims="1"></a>
   <div class="bg-blue-100 flex h-screen w-full items-center justify-center">
     <div class="">
       <Header></Header>
