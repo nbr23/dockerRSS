@@ -13,6 +13,18 @@ type DockerImageName struct {
 	Tag   string
 }
 
+func (d DockerImageName) GetImageURL(digest string) string {
+	return fmt.Sprintf("https://hub.docker.com/v2/layers/%s/%s/images/%s", d.Org, d.Image, digest)
+}
+
+func (d DockerImageName) GetURL() string {
+	url := fmt.Sprintf("https://hub.docker.com/v2/repositories/%s/%s/tags", d.Org, d.Image)
+	if d.Tag != "" {
+		url = fmt.Sprintf("%s/%s", url, d.Tag)
+	}
+	return url
+}
+
 func (d DockerImageName) String() string {
 	return fmt.Sprintf("%s/%s", d.Org, d.Image)
 }
@@ -48,6 +60,7 @@ type DockerhubImage struct {
 	Architecture string `json:"architecture"`
 	Os           string `json:"os"`
 	LastPushed   string `json:"last_pushed"`
+	FullName     DockerImageName
 }
 
 func ParseDockerImage(imageName string) DockerImageName {
@@ -76,23 +89,30 @@ func ParseDockerImage(imageName string) DockerImageName {
 	}
 }
 
-func GetDockerImageTagDetails(image DockerImageName) (DockerhubTag, error) {
+func GetDockerTagImagesDetails(image DockerImageName) ([]DockerhubImage, error) {
+	var images []DockerhubImage
 	res, err := http.Get(fmt.Sprintf("https://hub.docker.com/v2/repositories/%s/tags/%s", image, image.Tag))
 	if err != nil {
-		return DockerhubTag{}, err
+		return nil, err
 	}
 	defer res.Body.Close()
 
 	var dResponse DockerhubTag
 	err = json.NewDecoder(res.Body).Decode(&dResponse)
 	if err != nil {
-		return DockerhubTag{}, err
+		return nil, err
 	}
 
-	return dResponse, nil
+	for _, i := range dResponse.Images {
+		i.FullName = image
+		images = append(images, i)
+	}
+
+	return images, nil
 }
 
-func GetDockerImageTags(image DockerImageName) ([]DockerhubTag, error) {
+func GetDockerTagsImages(image DockerImageName) ([]DockerhubImage, error) {
+	var images []DockerhubImage
 	res, err := http.Get(fmt.Sprintf("https://hub.docker.com/v2/repositories/%s/tags/?page_size=25&page=1&ordering=last_updated", image))
 	if err != nil {
 		return nil, err
@@ -109,5 +129,13 @@ func GetDockerImageTags(image DockerImageName) ([]DockerhubTag, error) {
 		return nil, fmt.Errorf("no tags found")
 	}
 
-	return dResponse.Results, nil
+	for _, t := range dResponse.Results {
+		for _, i := range t.Images {
+			i.FullName = image
+			i.FullName.Tag = t.Name
+			images = append(images, i)
+		}
+	}
+
+	return images, nil
 }

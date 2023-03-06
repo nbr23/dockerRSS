@@ -9,36 +9,33 @@ import (
 	"github.com/nbr23/dockerRSS/dockerhub"
 )
 
-func dockerhubTagToAtomEntry(image dockerhub.DockerImageName, tag dockerhub.DockerhubTag) string {
-	// We just use the first image in the manifest list, shouldn't matter much
-	if len(tag.Digest) == 0 {
-		tag.Digest = tag.Images[0].Digest
-	}
-	digest := strings.Replace(tag.Digest, ":", "-", -1)
+func dockerhubTagToAtomEntry(image dockerhub.DockerhubImage) string {
+	digest := strings.Replace(image.Digest, ":", "-", -1)
 
-	guid := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprint(image.Pretty(), tag.Name, tag.LastUpdated))))
+	guid := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprint(image.FullName.Pretty(), image.FullName, image.Os, image.Architecture, image.LastPushed))))
 	return fmt.Sprintf(`
 	<entry>
-		<title>%s - %s</title>
+		<title>%s - %s/%s</title>
 		<guid>%s</guid>
 		<updated>%s</updated>
-		<link href="https://hub.docker.com/layers/%s/%s/images/%s" />
+		<link href="%s" />
 	</entry>
-	`, image.Pretty(), tag.Name, guid, tag.LastUpdated, image, tag.Name, digest)
+	`, image.FullName.Pretty(), image.Os, image.Architecture, guid, image.LastPushed, image.FullName.GetImageURL(digest))
+
 }
 
-func GenerateAtomFeed(image dockerhub.DockerImageName, tags []dockerhub.DockerhubTag) string {
+func GenerateAtomFeed(imageName dockerhub.DockerImageName, images []dockerhub.DockerhubImage) string {
 	var entries []string
 	var lastPushed time.Time
-	for _, tag := range tags {
-		entries = append(entries, dockerhubTagToAtomEntry(image, tag))
-		tagPushed, err := time.Parse("2006-01-02T15:04:05.999999Z", tag.TagLastPushed)
+	for _, i := range images {
+		entries = append(entries, dockerhubTagToAtomEntry(i))
+		imagePushed, err := time.Parse("2006-01-02T15:04:05.999999Z", i.LastPushed)
 		if err != nil {
 			fmt.Println("Error while parsing date :", err)
 			continue
 		}
-		if lastPushed.Before(tagPushed) {
-			lastPushed = tagPushed
+		if lastPushed.Before(imagePushed) {
+			lastPushed = imagePushed
 		}
 	}
 
@@ -49,5 +46,5 @@ func GenerateAtomFeed(image dockerhub.DockerImageName, tags []dockerhub.Dockerhu
 	<updated>%s</updated>
 	%s
 </feed>
-	`, image.Pretty(), image.Pretty(), lastPushed, strings.Join(entries, ""))
+	`, imageName.Pretty(), imageName.Pretty(), lastPushed, strings.Join(entries, ""))
 }

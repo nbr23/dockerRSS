@@ -17,22 +17,20 @@ type MyEvent struct {
 }
 
 func tagsHandler(w http.ResponseWriter, r *http.Request) {
-	imageName := strings.TrimPrefix(r.URL.Path, "/tags/")
-	image := dockerhub.ParseDockerImage(imageName)
+	imageName := dockerhub.ParseDockerImage(strings.TrimPrefix(r.URL.Path, "/tags/"))
 
-	var tags []dockerhub.DockerhubTag
+	var images []dockerhub.DockerhubImage
 	var err error
 
-	if image.Tag != "" {
-		t, err := dockerhub.GetDockerImageTagDetails(image)
+	if imageName.Tag != "" {
+		images, err = dockerhub.GetDockerTagImagesDetails(imageName)
 		if err != nil {
 			http.Error(w, "tag not found", http.StatusNotFound)
 			log.Printf("%s 404 tag not found: %s", r.URL.Path, err)
 			return
 		}
-		tags = append(tags, t)
 	} else {
-		tags, err = dockerhub.GetDockerImageTags(image)
+		images, err = dockerhub.GetDockerTagsImages(imageName)
 		if err != nil {
 			http.Error(w, "no tags found", http.StatusNotFound)
 			log.Printf("%s 404 tag not found: %s", r.URL.Path, err)
@@ -40,9 +38,20 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	arch := r.URL.Query().Get("arch")
+	if arch != "" {
+		var filteredImages []dockerhub.DockerhubImage
+		for _, i := range images {
+			if i.Architecture == arch {
+				filteredImages = append(filteredImages, i)
+			}
+		}
+		images = filteredImages
+	}
+
 	w.Header().Set("Content-Type", "application/atom+xml")
 
-	atomFeed := atom.GenerateAtomFeed(image, tags)
+	atomFeed := atom.GenerateAtomFeed(imageName, images)
 	log.Printf("%s 200", r.URL.Path)
 	fmt.Fprint(w, atomFeed)
 }
