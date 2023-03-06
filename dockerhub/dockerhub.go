@@ -20,7 +20,7 @@ type DockerImagePlatform struct {
 }
 
 func (d DockerImageName) GetImageURL(digest string) string {
-	return fmt.Sprintf("https://hub.docker.com/v2/layers/%s/%s/images/%s", d.Org, d.Image, digest)
+	return fmt.Sprintf("https://hub.docker.com/layers/%s/%s/%s/images/%s", d.Org, d.Image, d.Tag, digest)
 }
 
 func (d DockerImageName) GetURL() string {
@@ -149,7 +149,9 @@ func GetDockerTagImagesDetails(image DockerImageName) ([]DockerhubImage, error) 
 
 	for _, i := range dResponse.Images {
 		i.FullName = image
-		images = append(images, i)
+		if i.Os != "unknown" {
+			images = append(images, i)
+		}
 	}
 
 	return images, nil
@@ -177,7 +179,10 @@ func GetDockerTagsImages(image DockerImageName) ([]DockerhubImage, error) {
 		for _, i := range t.Images {
 			i.FullName = image
 			i.FullName.Tag = t.Name
-			images = append(images, i)
+
+			if i.Os != "unknown" {
+				images = append(images, i)
+			}
 		}
 	}
 
