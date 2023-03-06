@@ -9,7 +9,7 @@ export default {
       imageName: '',
       currentUrl: location.toString(),
       imageTag: '',
-      imagePlatform: 'Any',
+      imagePlatform: '',
     }
   },
   methods: {
@@ -55,13 +55,9 @@ export default {
                     for="imagePlatform">
                     Platform:
                   </label>
-                  <select v-model="imagePlatform"
+                  <input v-model="imagePlatform"
                     class="block appearance-none w-full bg-grey-lighter border border-grey-lighter text-grey-darker py-3 px-4 pr-8 rounded"
-                    id="imagePlatform">
-                    <option>Any</option>
-                    <option>linux/arm64</option>
-                    <option>linux/amd64</option>
-                  </select>
+                    id="imagePlatform" placeholder="linux/arm64" />
                 </div>
               </div>
             </div>
