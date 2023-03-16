@@ -5,7 +5,7 @@ COPY --chown=node ./front /app
 WORKDIR /app/front
 RUN npm i && npm run build
 
-FROM golang:1.19-alpine as builder
+FROM golang:1.20-alpine as builder
 ENV PORT=8080
 
 WORKDIR /app
