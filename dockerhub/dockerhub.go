@@ -46,6 +46,14 @@ func (d DockerImageName) Pretty() string {
 	return fmt.Sprintf("%s/%s", d.Org, image)
 }
 
+func (d DockerImageName) RepoName() string {
+	image := d.Image
+	if d.Org == "library" {
+		return image
+	}
+	return fmt.Sprintf("%s/%s", d.Org, image)
+}
+
 type DockerhubTag struct {
 	Name          string           `json:"name"`
 	LastUpdated   string           `json:"last_updated"`
