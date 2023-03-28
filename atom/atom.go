@@ -19,9 +19,9 @@ func dockerhubTagToAtomEntry(image dockerhub.DockerhubImage) string {
 		<guid>%s</guid>
 		<updated>%s</updated>
 		<link href="%s" />
-		<content type="html"><![CDATA[Image %s@sha256:%s was pushed with tag %s.]]></content>
+		<content type="html"><![CDATA[Image %s@%s was pushed with tag %s.]]></content>
 	</entry>
-	`, image.FullName.Pretty(), image.Platform(), guid, image.LastPushed, image.FullName.GetImageURL(digest), image.FullName.RepoName(), digest, image.FullName.Tag)
+	`, image.FullName.Pretty(), image.Platform(), guid, image.LastPushed, image.FullName.GetImageURL(digest), image.FullName.RepoName(), image.Digest, image.FullName.Tag)
 
 }
 
