@@ -1,4 +1,4 @@
-FROM node as nodebuilder
+FROM --platform=$BUILDPLATFORM node:19-alpine as nodebuilder
 USER node
 
 COPY --chown=node ./front /app
