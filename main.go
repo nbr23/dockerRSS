@@ -49,7 +49,12 @@ func tagsHandler(w http.ResponseWriter, r *http.Request) {
 		images = filteredImages
 	}
 
-	w.Header().Set("Content-Type", "application/atom+xml")
+	format := r.URL.Query().Get("format")
+	if format == "plain" {
+		w.Header().Set("Content-Type", "text/xml")
+	} else {
+		w.Header().Set("Content-Type", "application/atom+xml")
+	}
 
 	atomFeed := atom.GenerateAtomFeed(imageName, images)
 	log.Printf("%s 200", r.URL.Path)
