@@ -37,14 +37,14 @@ pipeline {
         stage('Build DockerRSS Image') {
             steps {
                 sh """
-                    docker buildx build --pull --builder \$BUILDX_BUILDER  --platform linux/amd64,linux/arm64 -t nbr23/dockerrss:latest -f docker/Dockerfile --push .
+                    docker buildx build --pull --builder \$BUILDX_BUILDER  --platform linux/amd64,linux/arm64 -t nbr23/dockerrss:`git rev-parse --short HEAD` -t nbr23/dockerrss:latest -f docker/Dockerfile --push .
                     """
             }
         }
         stage('Build DockerRSS-nginx Image') {
             steps {
                 sh """
-                    docker buildx build --pull --builder \$BUILDX_BUILDER  --platform linux/amd64,linux/arm64 -t nbr23/dockerrss:nginx-latest -f docker/Dockerfile.nginx --push .
+                    docker buildx build --pull --builder \$BUILDX_BUILDER  --platform linux/amd64,linux/arm64 -t nbr23/dockerrss:nginx-`git rev-parse --short HEAD` -t nbr23/dockerrss:nginx-latest -f docker/Dockerfile.nginx --push .
                     """
             }
         }
