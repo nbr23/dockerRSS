@@ -13,11 +13,21 @@ export default {
     }
   },
   methods: {
-    getRssFeedURL: function () {
-      return this.currentUrl + "tags/" + this.imageName + (this.imageTag == '' ? '' : ':' + this.imageTag) + (this.imagePlatform == 'Any' || this.imagePlatform == '' ? '' : '?platform=' + this.imagePlatform);
+    getRssFeedURL: function (preview = false) {
+      const queryArgs = [];
+      if (this.imagePlatform != 'Any' && this.imagePlatform != '') {
+        queryArgs.push('platform=' + this.imagePlatform);
+      }
+      if (preview) {
+        queryArgs.push('format=plain');
+      }
+      return this.currentUrl + "tags/" + this.imageName + (this.imageTag == '' ? '' : ':' + this.imageTag) + (queryArgs.length > 0 ? ('?' + queryArgs.join('&')) : '');
     },
     copyUrlToClipboard: function (str) {
       navigator.clipboard.writeText(str);
+    },
+    previewUrl: function (str) {
+      window.open(str, '_blank');
     }
   }
 }
@@ -72,8 +82,12 @@ export default {
                   <input disabled
                     class="appearance-none block w-full bg-gray-100 rounded border bg-opacity-100 border-gray-300 border rounded py-3 px-4 mb-3"
                     id="feed-url" name="feed-url" type="text" :value=getRssFeedURL()>
-                  <button v-on:click.prevent=copyUrlToClipboard(getRssFeedURL())
-                    class="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">Copy</button>
+                  <div class="flex mx-auto justify-center mx-auto items-center">
+                    <button v-on:click.prevent=previewUrl(getRssFeedURL(true))
+                      class="text-white bg-indigo-300 border-0 py-2 px-10 mr-4 focus:outline-none hover:bg-indigo-400 rounded text-lg">Preview</button>
+                    <button v-on:click.prevent=copyUrlToClipboard(getRssFeedURL())
+                      class="text-white bg-indigo-500 border-0 py-2 px-10 ml-4 focus:outline-none hover:bg-indigo-600 rounded text-lg">Copy</button>
+                  </div>
                 </div>
               </div>
             </div>
