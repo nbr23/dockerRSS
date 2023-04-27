@@ -10,9 +10,12 @@ ENV PORT=8080
 
 WORKDIR /app
 
+COPY go.* /app
+RUN go mod download
+
 COPY atom /app/atom
 COPY dockerhub /app/dockerhub
-COPY *.go go.* /app
+COPY *.go /app
 
 RUN go build
 

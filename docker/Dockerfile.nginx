@@ -9,9 +9,12 @@ FROM golang:1.20-alpine as builder
 
 WORKDIR /app
 
+COPY go.* /app
+RUN go mod download
+
 COPY atom /app/atom
 COPY dockerhub /app/dockerhub
-COPY *.go go.* /app
+COPY *.go /app
 
 RUN go build
 
